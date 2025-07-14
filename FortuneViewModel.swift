@@ -25,6 +25,24 @@ class FortuneViewModel: ObservableObject {
         "Did you compliment someone while secretly judging their outfit?"
     ].shuffled()
 
+    @Published var questions: [String] = []
+
+    init() {
+        generateRandomQuestions()
+    }
+
+    func generateRandomQuestions() {
+        questions = allQuestions.shuffled().prefix(5).map { $0 }
+    }
+
+    func answerQuestion() {
+        currentIndex += 1
+    }
+
+    func generateRandomFortune() -> String {
+        return Bool.random() ? cursedFortunes.randomElement()! : encouragingFortunes.randomElement()!
+    }
+
     let cursedFortunes = [
         "Avoid synchronized blinking with strangers today.",
         "Refrain from petting any ceramic frogs before 5 PM.",
