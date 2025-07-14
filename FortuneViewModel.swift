@@ -3,7 +3,7 @@ import Foundation
 class FortuneViewModel: ObservableObject {
     @Published var currentIndex = 0
 
-    let questions: [String] = [
+    let allQuestions: [String] = [
         "Have you made eye contact with a mannequin this month?",
         "Did you eat anything beige today?",
         "Have you touched grass in the past 48 hours?",

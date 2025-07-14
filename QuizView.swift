@@ -29,13 +29,13 @@ struct QuizView: View {
                     .cornerRadius(10)
                 }
             } else {
-                NavigationLink(destination: FortuneView(fortune: viewModel.generateRandomFortune()), label: {
-                    Text("Reveal Your Fortune")
-                        .padding()
-                        .background(Color.purple)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                })
+                NavigationLink(destination: FortuneView(fortune: viewModel.generateRandomFortune(), viewModel: viewModel)) {
+    Text("Reveal Your Fortune")
+        .padding()
+        .background(Color.purple)
+        .foregroundColor(.white)
+        .cornerRadius(10)
+}
             }
         }
         .padding()
