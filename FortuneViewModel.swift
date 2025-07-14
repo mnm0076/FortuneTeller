@@ -1,58 +1,72 @@
 import Foundation
 
-struct FortuneData: Codable {
-    let questions: [String]
-    let cursed: [String]
-    let encouraging: [String]
+struct ZodiacSign: Codable {
+    let name: String
+    let start: String
+    let end: String
+}
+
+struct FortuneResponse: Codable {
+    let signs: [ZodiacSign]
+    let encouragingFortunes: [String]
+    let cursedFortunes: [String]
 }
 
 class FortuneViewModel: ObservableObject {
-    @Published var currentIndex = 0
-    @Published var questions: [String] = []
-    @Published var cursedFortunes: [String] = []
-    @Published var encouragingFortunes: [String] = []
+    @Published var userBirthday: Date = Date()
+    @Published var zodiacSign: String = ""
+    @Published var fortune: String = ""
 
-    init() {
-        fetchData()
-    }
+    private var signs: [ZodiacSign] = []
+    private var encouragingFortunes: [String] = []
+    private var cursedFortunes: [String] = []
 
-    func fetchData() {
-        guard let url = URL(string: "https://mocki.io/v1/b579192f-cf58-4868-9f54-d957605263c2") else {
-            print("Invalid URL")
-            return
-        }
+    func fetchFortunes() {
+        guard let url = URL(string: "https://mocki.io/v1/7d5316f4-9f65-4613-9628-0fb5fc9193dd") else { return }
 
-        URLSession.shared.dataTask(with: url) { data, _, error in
+        URLSession.shared.dataTask(with: url) { data, response, error in
             if let data = data {
                 do {
-                    let decoded = try JSONDecoder().decode(FortuneData.self, from: data)
+                    let decoded = try JSONDecoder().decode(FortuneResponse.self, from: data)
                     DispatchQueue.main.async {
-                        self.cursedFortunes = decoded.cursed
-                        self.encouragingFortunes = decoded.encouraging
-                        self.questions = decoded.questions.shuffled().prefix(5).map { $0 }
+                        self.signs = decoded.signs
+                        self.encouragingFortunes = decoded.encouragingFortunes
+                        self.cursedFortunes = decoded.cursedFortunes
+                        self.zodiacSign = self.determineZodiac(for: self.userBirthday)
+                        self.fortune = self.generateRandomFortune()
                     }
                 } catch {
-                    print("Decoding failed: \(error)")
+                    print("Decoding error: \(error)")
                 }
-            } else if let error = error {
-                print("HTTP error: \(error)")
             }
         }.resume()
     }
 
-    func answerQuestion() {
-        currentIndex += 1
+    private func determineZodiac(for date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MM-dd"
+        let calendar = Calendar.current
+        let birthString = formatter.string(from: date)
+
+        for sign in signs {
+            if let start = formatter.date(from: sign.start),
+               let end = formatter.date(from: sign.end) {
+                let birth = formatter.date(from: birthString)!
+                if sign.start > sign.end {
+                    if birth >= start || birth <= end {
+                        return sign.name
+                    }
+                } else {
+                    if birth >= start && birth <= end {
+                        return sign.name
+                    }
+                }
+            }
+        }
+        return "Unknown"
     }
 
-    func restartQuiz() {
-        currentIndex = 0
-        questions.shuffle()
-        questions = questions.prefix(5).map { $0 }
-    }
-
-    func generateRandomFortune() -> String {
-        return Bool.random()
-            ? cursedFortunes.randomElement() ?? "The stars are unusually quiet today."
-            : encouragingFortunes.randomElement() ?? "Something curious is in your favor."
+    private func generateRandomFortune() -> String {
+        return Bool.random() ? encouragingFortunes.randomElement() ?? "" : cursedFortunes.randomElement() ?? ""
     }
 }
