@@ -54,15 +54,21 @@ struct ContentView: View {
                         .font(.custom("Papyrus", size: 10))
                         .foregroundColor(Color.yellow)
                         .multilineTextAlignment(.center)
-                    Button("Toggle Music") {
+                    Button(action: {
                         AudioManager.shared.toggleMusic()
+                    }) {
+                        Button(action: {
+                            AudioManager.shared.toggleMusic()
+                        }) {
+                            Text("Toggle Music")
+                                .font(.custom("Papyrus", size: 16))
+                                .foregroundColor(.white)
+                                .padding(10)
+                                .background(Color.purple.opacity(0.6))
+                                .cornerRadius(8)
+                        }
+                    
                     }
-                    .font(.custom("Papyrus", size: 18))
-                    .foregroundColor(.white)
-                    .padding(7)
-                    .background(Color.purple.opacity(0.8))
-                    .cornerRadius(10)
-                    .shadow(color: .purple, radius: 6)
                 } else {
                     VStack(spacing: 15) {
                         Text("Based on your birthday:")
@@ -131,5 +137,4 @@ struct ContentView: View {
         }
     }
 }
-
 
