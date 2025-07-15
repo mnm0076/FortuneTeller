@@ -2,16 +2,18 @@ import AVFoundation
 
 class AudioManager {
     static let shared = AudioManager()
-    var player: AVAudioPlayer?
+    private var audioPlayer: AVAudioPlayer?
+    private(set) var isPlaying = false
 
     func playMusic() {
-        if let path = Bundle.main.path(forResource: "YourAudioFile", ofType: "mp3") {
-            let url = URL(fileURLWithPath: path)
+        guard !isPlaying else { return }
 
+        if let url = Bundle.main.url(forResource: "fortune_music", withExtension: "mp3") {
             do {
-                player = try AVAudioPlayer(contentsOf: url)
-                player?.numberOfLoops = -1 // Loop forever
-                player?.play()
+                audioPlayer = try AVAudioPlayer(contentsOf: url)
+                audioPlayer?.numberOfLoops = -1
+                audioPlayer?.play()
+                isPlaying = true
             } catch {
                 print("Error playing music: \(error)")
             }
@@ -19,15 +21,11 @@ class AudioManager {
     }
 
     func stopMusic() {
-        player?.stop()
-        player = nil
+        audioPlayer?.stop()
+        isPlaying = false
     }
 
     func toggleMusic() {
-        if let player = player, player.isPlaying {
-            stopMusic()
-        } else {
-            playMusic()
-        }
+        isPlaying ? stopMusic() : playMusic()
     }
 }
