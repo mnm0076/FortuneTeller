@@ -108,3 +108,4 @@ struct SeededGenerator: RandomNumberGenerator {
         return self.state
     }
 }
+
